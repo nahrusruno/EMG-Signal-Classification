@@ -1,7 +1,7 @@
 # EMG-Signal-Classificaiton
-Signal processing and classification based on EMG data gathered from lower limb
+**Signal processing and classification based on EMG data gathered from lower limb**
 
-The raw data used is published by Lencioni et al. and can be found from this link: https://www.nature.com/articles/s41597-019-0323-z [1]
+The raw data used is published by Lencioni et al. and can be found from this [link](https://www.nature.com/articles/s41597-019-0323-z) [1]
 
 After preprocessing of the data followed by a feature extraction procedure, the main goal is to compare several algorithms by their performance.
 
@@ -17,5 +17,6 @@ Scoring for binary classification will be based on accuracy metric and ROC curve
 
 The progression is published continuously 
 
-References
-[1] Lencioni, T., Carpinella, I., Rabuffetti, M. et al. Human kinematic, kinetic and EMG data during different walking and stair ascending and descending tasks. Sci Data 6, 309 (2019). https://doi.org/10.1038/s41597-019-0323-z
+**References**
+
+**[1] Lencioni, T., Carpinella, I., Rabuffetti, M. et al. Human kinematic, kinetic and EMG data during different walking and stair ascending and descending tasks. Sci Data 6, 309 (2019). https://doi.org/10.1038/s41597-019-0323-z**
