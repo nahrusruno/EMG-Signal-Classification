@@ -3,6 +3,7 @@ import scipy.io as sio
 from mat4py import loadmat
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 pd.set_option('display.max_rows', 500)
 
 def get_csv():
@@ -49,3 +50,9 @@ def get_csv():
     #pd.read_csv('data/all_data.csv')
     return main_df
 
+
+datam = get_csv()
+print(datam.head())
+
+plt.plot(datam.loc[1,'TA'])
+plt.show()
