@@ -45,7 +45,7 @@ def get_csv():
     print('Toe Walking trail number: {}'.format(main_df[main_df['Task']=='ToeWalking'].shape[0]))
     print('Heel Walking trail number: {}'.format(main_df[main_df['Task']=='HeelWalking'].shape[0]))    
     
-    main_df.to_csv('data/all_data.csv', index=False)
-    
-    return pd.read_csv('data/all_data.csv')
+    #main_df.to_csv('data/all_data.csv', index=False)
+    #pd.read_csv('data/all_data.csv')
+    return main_df
 
