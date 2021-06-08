@@ -6,15 +6,22 @@ Created on Mon Jun  7 23:34:24 2021
 @author: onursurhan
 """
 import numpy as np
-from numpy.lib.stride_tricks import sliding_window_view
+from preprocess_class import *
 
 class extractFeatures:
     
     def __init__(self, preprocessed_EMG_data, window_size):
         
-        self.data = preprocessed_data   #It contains many trials for several muscles
+        self.data = preprocessed_EMG_data   #It contains many trials for several muscles
         self.window_size = window_size
-        
+
+    def rolling_window(self, data, step_size=1):
+        window = self.window_size
+        shape = data.shape[:-1] + (data.shape[-1] - window + 1 - step_size + 1, window)
+        strides = data.strides + (data.strides[-1] * step_size,)
+        return np.lib.stride_tricks.as_strided(data, shape=shape, strides=strides)
+
+       
     def WAMP(self, windowed_data, threshold):        
         
         """ Willison Amplitude
@@ -28,11 +35,15 @@ class extractFeatures:
         :return: scalar feature value
         """
         
-        wamp=0    
+       # wamp=0    
         
-        for i in range(len(windowed_data)):         
-            if abs(windowed_data[i]-windowed_data[i+1])>threshold:
-                wamp=wamp+1;           
+       # for i in range(len(windowed_data)):         
+       #     if abs(windowed_data[i]-windowed_data[i+1])>threshold:
+        #        wamp=wamp+1;    
+        fs = 200
+        n = windowed_data.shape[0]
+
+        wamp = np.sum(((abs(windowed_data[1:n - 1] - windowed_data[0:n - 2])) > threshold), axis=0) * fs / n
         return wamp  
     
     def RMS(self, windowed_data):
@@ -95,14 +106,26 @@ class extractFeatures:
         :return: scalar feature value
         """
         return np.sum(np.square(data_input), axis=0) / (windowed_data.shape[0]-1)
-    
+
+
+    def log_detector(self, windowed_data):
+        
+        """ V-Order
+        "This metric yields an estimation of the exerted muscle force" (Tkach et. al 4)
+        logdetect = e raised to (the mean of the log of the absolute value of the signal input)
+        :param data_input: input samples to compute feature
+        :return: scalar feature value
+        """
+
+        # TODO: log detect function needs to protect against log(0) (-INF) occuring
+        return math.e**(np.mean(np.log(abs(windowed_data)), axis=0))
     
     def createSelectedFeatures(self, muscles=['all'], features=['all']):
         
         if muscles[0]=='all':
-            column_names = ['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']
+            muscle_names = ['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']
         else:
-            column_names = muscles
+            muscle_names = muscles
             
         if features[0]=='all':
             feature_names = ['WAMP','RMS','MAV','ZC','V_ORDER']
@@ -111,16 +134,19 @@ class extractFeatures:
         
         new_column_names=[]
         for feature_name in feature_names:
-            for column_name in column_names:
-                column_names = new_column_names.append(column_name+'_'+feature_name)
+            for column_name in muscle_names:
+                #column_names = new_column_names.append(column_name+'_'+feature_name)
+                new_column_names.append(column_name+'_'+feature_name)
+
+        print(new_column_names)
         
-        extracted_feature_df = pd.DataFrame(columns=column_names)        
+        extracted_feature_df = pd.DataFrame(columns=new_column_names)        
         
         for i in range(len(self.data)):
-            for j in column_names:
-                temporary_data = sliding_window_view(data.loc[i,j], self.window_size)                          
-                for l in range(feature_names):
-                    #temporary_array = np.array([])
+            for j in muscle_names:
+                #temporary_data = np.lib.stride_tricks.sliding_window_view(self.data.loc[i,j], self.window_size) 
+                temporary_data = self.rolling_window(self.data.loc[i,j])                          
+                for l in feature_names:
                     temporary_list = []
                     if l=='WAMP':
                         for k in range(len(temporary_data)):
@@ -139,9 +165,19 @@ class extractFeatures:
                             temporary_list.append(self.v_order(temporary_data[k,:])) 
                     elif l=='VAR':
                         for k in range(len(temporary_data)):
-                            temporary_list.append(self.v_order(temporary_data[k,:])) 
+                            temporary_list.append(self.variance(temporary_data[k,:]))                            
+                    elif l=='LOG':
+                        for k in range(len(temporary_data)):
+                            temporary_list.append(self.log_detector(temporary_data[k,:])) 
                             
                     extracted_feature_df.loc[i,j+'_'+l] = temporary_list
                 
+ 
+data_class = preprocessor(get_csv())
+resultant_df = data_class.concatingDataframe('interpolated_filtered')
+
+extractor = extractFeatures(preprocessed_EMG_data=resultant_df.loc[:,['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']], window_size=50)
+extracted_feature_EMGs = extractor.createSelectedFeatures()       
+                        
         
         
