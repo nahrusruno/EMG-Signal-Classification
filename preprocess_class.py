@@ -152,9 +152,9 @@ class preprocessor:
         return united_df
 
 
-
-data_class = preprocessor(get_csv())
-resultant_df = data_class.concatingDataframe('interpolated_filtered')
+the_dataset = get_csv() # Construct raw dataframe from mat file to dataframe
+data_class = preprocessor(dataset = the_dataset) # Contstruct preprocessor class with fixed parameters given inside __init__
+resultant_df = data_class.concatingDataframe() # Preprocessed dataset with default parameters (desired configurations)
 
 
 
