@@ -16,6 +16,7 @@ class extractFeatures:
         self.window_size = window_size
 
     def rolling_window(self, data, step_size=1):
+
         window = self.window_size
         shape = data.shape[:-1] + (data.shape[-1] - window + 1 - step_size + 1, window)
         strides = data.strides + (data.strides[-1] * step_size,)
@@ -171,17 +172,30 @@ class extractFeatures:
                             temporary_list.append(self.log_detector(temporary_data[k,:])) 
                             
                     extracted_feature_df.loc[i,j+'_'+l] = temporary_list
-    def reshaper(self, df):
+                    
+    def reshapeDataset(self, df):
+        """ This function takes the dataset with extracted features and makes the dataset
+        ready for feeding model by reshaping it. The shape of return is 
+        X.shape(number of samples, number of time steps, number of features)
+        """
         X = []
         for i in range(np.shape(df)[0]):
+            X_per_sample = []
             for j in range(np.shape(df)[1]):
-                df.loc[i,j]           
+                X_per_sample.append(df.iloc[i,j])
+            X.append(np.asarray(X_per_sample))
+        X = np.stack(X, axis=0)
+        
+        return X
+        
+        
  
 data_class = preprocessor(get_csv())
 resultant_df = data_class.concatingDataframe('interpolated_filtered')
 
 extractor = extractFeatures(preprocessed_EMG_data=resultant_df.loc[:,['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']], window_size=50)
-extracted_feature_EMGs = extractor.createSelectedFeatures()       
-                        
+extracted_feature_EMGs = extractor.createSelectedFeatures(muscles=['TA','SO','GAM'], features = ['WAMP','RMS'])       
+modele_girecek_data = extractor.reshaper(extracted_feature_EMGs)
+        
         
         
