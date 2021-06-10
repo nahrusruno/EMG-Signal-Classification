@@ -93,12 +93,7 @@ class extractFeatures:
         "This metric yields an estimation of the exerted muscle force...
         characterized by the absolute value of EMG signal
         to the vth power. The applied smoothing filter is the moving
-        average window. Therefore, this feature is defined as
-        , where E is the expectation operator
-        applied on the samples in one analysis window. One study
-        indicates that the best value for v is 2, which leads to
-        the definition of the EMG v-Order feature as the same as
-        the square root of the var feature." (Tkach et. al 4)
+        average window. 
         vorder = sqrt(sum of signal x squared in an analysis time window with n samples, over (n-1))
         :param windowed_data: input samples to compute feature
         :return: scalar feature value
@@ -198,15 +193,24 @@ class extractFeatures:
                 
     def labelEncoding(self, dataset):
         
-        label_encoder = LabelEncoder()
-        dataset['Task']= label_encoder.fit_transform(dataset['Task'])
+        """ The labels which are aimed to be classifed are transformed into """
+        self.label_encoder = LabelEncoder()
+        dataset['Task']= self.label_encoder.fit_transform(dataset['Task'])
+        
+        self.labels_array = dataset['Task'].values
         
         return dataset['Task']
     
+    def labelDecoder(self):
+        
+        """ This function can be used when the actual labels are wanted to be seen """
+        actual_labels = list(self.label_encoder.inverse_transform(self.labels_array))
+    
+        return actual_labels
+        
 data_class = preprocessor(get_csv())
 resultant_df = data_class.concatingDataframe('interpolated_filtered')
 extractor = extractFeatures(preprocessed_EMG_data=resultant_df.loc[:,['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']], window_size=50)
 extracted_feature_EMGs = extractor.createSelectedFeatures(muscles=['TA','SO','GAM'], features = ['WAMP','RMS'])       
 X = extractor.reshapeDataset(extracted_feature_EMGs)
-y = extractor.labelEncoding(resultant_df).loc[:,'Task']
-        
+y = extractor.labelEncoding(resultant_df).values
