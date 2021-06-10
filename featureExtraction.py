@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jun  7 23:34:24 2021
-
 @author: onursurhan
 """
 import numpy as np
 from preprocess_class import *
+from sklearn.preprocessing import LabelEncoder
 
 class extractFeatures:
     
