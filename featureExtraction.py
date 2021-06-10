@@ -191,7 +191,7 @@ class extractFeatures:
             X_per_sample = []
             for j in range(np.shape(df)[1]):
                 X_per_sample.append(df.iloc[i,j])
-            X.append(np.asarray(X_per_sample))
+            X.append(np.transpose(np.asarray(X_per_sample)))
         X = np.stack(X, axis=0)
         
         return X
@@ -207,6 +207,6 @@ data_class = preprocessor(get_csv())
 resultant_df = data_class.concatingDataframe('interpolated_filtered')
 extractor = extractFeatures(preprocessed_EMG_data=resultant_df.loc[:,['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']], window_size=50)
 extracted_feature_EMGs = extractor.createSelectedFeatures(muscles=['TA','SO','GAM'], features = ['WAMP','RMS'])       
-X = extractor.reshaper(extracted_feature_EMGs)
+X = extractor.reshapeDataset(extracted_feature_EMGs)
 y = extractor.labelEncoding(resultant_df).loc[:,'Task']
         
