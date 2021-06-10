@@ -195,15 +195,18 @@ class extractFeatures:
         X = np.stack(X, axis=0)
         
         return X
+                
+    def labelEncoding(self, dataset):
         
+        label_encoder = LabelEncoder()
+        dataset['Task']= label_encoder.fit_transform(dataset['Task'])
         
- 
+        return dataset['Task']
+    
 data_class = preprocessor(get_csv())
 resultant_df = data_class.concatingDataframe('interpolated_filtered')
-
 extractor = extractFeatures(preprocessed_EMG_data=resultant_df.loc[:,['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']], window_size=50)
 extracted_feature_EMGs = extractor.createSelectedFeatures(muscles=['TA','SO','GAM'], features = ['WAMP','RMS'])       
-modele_girecek_data = extractor.reshaper(extracted_feature_EMGs)
-        
-        
+X = extractor.reshaper(extracted_feature_EMGs)
+y = extractor.labelEncoding(resultant_df).loc[:,'Task']
         
