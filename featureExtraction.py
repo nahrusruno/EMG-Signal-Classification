@@ -16,7 +16,15 @@ class extractFeatures:
         self.window_size = window_size
 
     def rolling_window(self, data, step_size=1):
-
+        """ A.K.A. Moving average window. It takes a specified portion from the data provided for making desired calculations.
+        Rolling window is beneficial in extracting features from a time series data. Because the rapid changes occur in these kinds
+        of data, windowing smoothes these kinds of data and it results in more comprehendible data. 
+        
+        The data entered in this function, loose some portion of its length as much as (window size-1) ## No padding with zeros ##.
+        As can be understood from the notation below, windowing resembles with stride=1 in deep learning. 
+        
+        The algorithm is vectorized so that the complexity is reduced.
+        """
         window = self.window_size
         shape = data.shape[:-1] + (data.shape[-1] - window + 1 - step_size + 1, window)
         strides = data.strides + (data.strides[-1] * step_size,)
