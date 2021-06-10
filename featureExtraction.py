@@ -171,7 +171,11 @@ class extractFeatures:
                             temporary_list.append(self.log_detector(temporary_data[k,:])) 
                             
                     extracted_feature_df.loc[i,j+'_'+l] = temporary_list
-                
+    def reshaper(self, df):
+        X = []
+        for i in range(np.shape(df)[0]):
+            for j in range(np.shape(df)[1]):
+                df.loc[i,j]           
  
 data_class = preprocessor(get_csv())
 resultant_df = data_class.concatingDataframe('interpolated_filtered')
