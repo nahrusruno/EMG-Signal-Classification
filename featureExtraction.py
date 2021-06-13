@@ -125,6 +125,18 @@ class extractFeatures:
     
     def createSelectedFeatures(self, muscles=['all'], features=['all']):
         
+        """ Constructing dataset with extracted features in a desired configuration
+        
+        param - muscles: desired muscles to be included in the input samples
+                        default: 'all' which stands for ['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']
+        param - features: desired features to be calculated for each of the selected muscles to use in model
+                        default: 'all' which stands for ['WAMP','RMS','MAV','ZC','V_ORDER']  
+                        
+        :return: extracted_feature_df: Pandas dataframe which consist of combination of desired muscles and features.
+                        Examples for the column names of the extracted_feature_df dataframe: 'TA_WAMP' or 'GAM_RMS'
+        
+        """
+        
         if muscles[0]=='all':
             muscle_names = ['TA', 'SO', 'GAM', 'PL', 'RF', 'VM', 'BF', 'GM']
         else:
@@ -174,6 +186,8 @@ class extractFeatures:
                             temporary_list.append(self.log_detector(temporary_data[k,:])) 
                             
                     extracted_feature_df.loc[i,j+'_'+l] = temporary_list
+                    
+        return extracted_feature_df
                     
     def reshapeDataset(self, df):
         """ This function takes the dataset with extracted features and makes the dataset
