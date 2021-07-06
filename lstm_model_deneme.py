@@ -22,20 +22,29 @@ from keras.layers import Dense, LSTM
 from keras.layers.core import Dropout
 from keras.wrappers.scikit_learn import KerasClassifier
 from keras.callbacks import EarlyStopping
-
+from keras.utils import to_categorical 
+from tensorflow.keras import regularizers
 
 X = np.load('X_step_up&down.npy')
 Y = np.load('y_step_up&down.npy')
 Y = Y - 1 
+
+Y = to_categorical(Y)
 #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
 model = Sequential()
 #        model.add(LSTM(self.first_layer_neurons, input_dim=self.input_dimension , dropout_U=0.3)) ## I don't understand why droupout_U is used
-model.add(LSTM(15, input_shape=(X.shape[1],X.shape[2])))
-model.add(Dense(10))
-model.add(Dropout(0.2))
-model.add(Dense(1, activation="sigmoid"))
-model.compile(loss="binary_crossentropy",
+model.add(LSTM(150, input_shape=(X.shape[1],X.shape[2])))
+model.add(Dense(100, kernel_regularizer=regularizers.l1_l2(l1=1e-3, l2=1e-2),
+    bias_regularizer=regularizers.l2(1e-2),
+    activity_regularizer=regularizers.l2(1e-2)))
+#model.add(Dropout(0.2))
+model.add(Dense(50, kernel_regularizer=regularizers.l1_l2(l1=1e-3, l2=1e-2),
+    bias_regularizer=regularizers.l2(1e-2),
+    activity_regularizer=regularizers.l2(1e-2)))
+#model.add(Dropout(0.4))
+model.add(Dense(2, activation="softmax"))
+model.compile(loss="categorical_crossentropy",
               optimizer="adam",
               metrics=["accuracy"])
 
@@ -51,7 +60,7 @@ model.compile(loss="binary_crossentropy",
 # y_predicted = (model.predict(X_test) > 0.5).astype("int32")
 # y_actual = y_test
 
-history = model.fit(X, Y, validation_split=0.25, epochs=150, batch_size=10, verbose=3)
+history = model.fit(X, Y, validation_split=0.25, epochs=150)
 # list all data in history
 print(history.history.keys())
 # summarize history for accuracy
@@ -90,8 +99,12 @@ plt.show()
 # print("%.2f%% (+/- %.2f%%)" % (numpy.mean(cvscores), numpy.std(cvscores)))
 
 
-
-
+predictions = model.predict(X_test)
+y_predicted = np.zeros(len(X_test))
+for i in range(len(X_test)):
+    if predictions[i,0]<predictions[i,1]:
+        y_predicted[i]=1
+        
 
 
 
