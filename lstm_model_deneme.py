@@ -30,6 +30,8 @@ Y = np.load('y_step_up&down.npy')
 Y = Y - 1 
 
 Y = to_categorical(Y)
+
+# Validation split may be created
 #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
 
 model = Sequential()
