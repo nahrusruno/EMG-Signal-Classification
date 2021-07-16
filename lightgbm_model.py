@@ -566,6 +566,7 @@ Y = Y - 1
 # X = extractor.reshapeDataset(extracted_feature_EMGs)
 # y = extractor.labelEncoding(resultant_df).values
 
+## Validation split is created
 X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.25)
 
 
